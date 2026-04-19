@@ -15,6 +15,7 @@
 // 1 pixel = SCALE meters
 // Earth radius in pixels = R_EARTH / SCALE ≈ 254 px  (fits comfortably)
 #define SCALE       25000.0
+// #define SCALE       250000.0
 
 // ── Simulation defaults ───────────────────────────────────────────────────────
 #define DT              1.0         // physics timestep (seconds)

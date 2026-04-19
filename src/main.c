@@ -102,8 +102,7 @@ int main(void)
     trail_init(&trail);
     E0 = specific_energy(state);
     H0 = specific_angular_momentum(state);
-    int i=0;
-    int j=0;
+
     // ── Main loop ─────────────────────────────────────────────────────────────
     while (!WindowShouldClose())
     {
@@ -201,18 +200,18 @@ int main(void)
                         (Color){100, 180, 255, 80});
 
         // ── Trail ─────────────────────────────────────────────────────────────
-        int tc = trail.count;
-        for (int i = 1; i < tc; i++) {
-            float x0, y0, x1, y1;
-            trail_get(&trail, i-1, &x0, &y0);
-            trail_get(&trail, i,   &x1, &y1);
+        // int tc = trail.count;
+        // for (int i = 1; i < tc; i++) {
+        //     float x0, y0, x1, y1;
+        //     trail_get(&trail, i-1, &x0, &y0);
+        //     trail_get(&trail, i,   &x1, &y1);
 
-            float alpha = (float)i / tc;        // older points more transparent
-            unsigned char a = (unsigned char)(alpha * 220.0f);
-            Color c = { 80, 200, 120, a };
+        //     float alpha = (float)i / tc;        // older points more transparent
+        //     unsigned char a = (unsigned char)(alpha * 220.0f);
+        //     Color c = { 80, 200, 120, a };
 
-            DrawLineV((Vector2){x0, y0}, (Vector2){x1, y1}, c);
-        }
+        //     DrawLineV((Vector2){x0, y0}, (Vector2){x1, y1}, c);
+        // }
 
         // ── Satellite ─────────────────────────────────────────────────────────
         Vector2 sat_screen = world_to_screen(state[0], state[1]);
@@ -227,91 +226,91 @@ int main(void)
                      20, RED);
         }
 
-        // ── HUD ───────────────────────────────────────────────────────────────
-        {
-            double r       = orbital_radius(state);
-            double alt_km  = (r - R_EARTH) / 1000.0;
-            double spd_kms = orbital_speed(state) / 1000.0;
-            double E_now   = specific_energy(state);
-            double H_now   = specific_angular_momentum(state);
-            double dE_pct  = fabs((E_now - E0) / (fabs(E0) + 1e-30)) * 100.0;
-            double dH_pct  = fabs((H_now - H0) / (fabs(H0) + 1e-30)) * 100.0;
+        // // ── HUD ───────────────────────────────────────────────────────────────
+        // {
+        //     double r       = orbital_radius(state);
+        //     double alt_km  = (r - R_EARTH) / 1000.0;
+        //     double spd_kms = orbital_speed(state) / 1000.0;
+        //     double E_now   = specific_energy(state);
+        //     double H_now   = specific_angular_momentum(state);
+        //     double dE_pct  = fabs((E_now - E0) / (fabs(E0) + 1e-30)) * 100.0;
+        //     double dH_pct  = fabs((H_now - H0) / (fabs(H0) + 1e-30)) * 100.0;
 
-            // HUD background panel
-            DrawRectangle(10, 10, 340, 260, (Color){0, 0, 0, 160});
-            DrawRectangleLines(10, 10, 340, 260, (Color){80, 120, 80, 200});
+        //     // HUD background panel
+        //     DrawRectangle(10, 10, 340, 260, (Color){0, 0, 0, 160});
+        //     DrawRectangleLines(10, 10, 340, 260, (Color){80, 120, 80, 200});
 
-            int y  = 20;
-            int dy = 24;
-            int x  = 20;
-            Color cw  = WHITE;
-            Color cg  = (Color){100, 255, 120, 255};
-            Color cy  = (Color){255, 220, 60,  255};
-            Color cr  = (Color){255, 80,  80,  255};
+        //     int y  = 20;
+        //     int dy = 24;
+        //     int x  = 20;
+        //     Color cw  = WHITE;
+        //     Color cg  = (Color){100, 255, 120, 255};
+        //     Color cy  = (Color){255, 220, 60,  255};
+        //     Color cr  = (Color){255, 80,  80,  255};
 
-            DrawText("ORBITAL MECHANICS SIM",    x, y, 16, cg);  y += dy + 4;
+        //     DrawText("ORBITAL MECHANICS SIM",    x, y, 16, cg);  y += dy + 4;
 
-            char buf[128];
+        //     char buf[128];
 
-            // Preset name
-            snprintf(buf, sizeof(buf), "Preset : %s", preset_names[preset_idx]);
-            DrawText(buf, x, y, 14, cy); y += dy;
+        //     // Preset name
+        //     snprintf(buf, sizeof(buf), "Preset : %s", preset_names[preset_idx]);
+        //     DrawText(buf, x, y, 14, cy); y += dy;
 
-            // Orbit type
-            snprintf(buf, sizeof(buf), "Orbit  : %s", orbit_type(state));
-            DrawText(buf, x, y, 14, cw); y += dy;
+        //     // Orbit type
+        //     snprintf(buf, sizeof(buf), "Orbit  : %s", orbit_type(state));
+        //     DrawText(buf, x, y, 14, cw); y += dy;
 
-            // Altitude
-            snprintf(buf, sizeof(buf), "Alt    : %.1f km", alt_km);
-            DrawText(buf, x, y, 14, cw); y += dy;
+        //     // Altitude
+        //     snprintf(buf, sizeof(buf), "Alt    : %.1f km", alt_km);
+        //     DrawText(buf, x, y, 14, cw); y += dy;
 
-            // Speed
-            snprintf(buf, sizeof(buf), "Speed  : %.3f km/s", spd_kms);
-            DrawText(buf, x, y, 14, cw); y += dy;
+        //     // Speed
+        //     snprintf(buf, sizeof(buf), "Speed  : %.3f km/s", spd_kms);
+        //     DrawText(buf, x, y, 14, cw); y += dy;
 
-            // Specific energy
-            snprintf(buf, sizeof(buf), "Energy : %.4e J/kg", E_now);
-            DrawText(buf, x, y, 14, cw); y += dy;
+        //     // Specific energy
+        //     snprintf(buf, sizeof(buf), "Energy : %.4e J/kg", E_now);
+        //     DrawText(buf, x, y, 14, cw); y += dy;
 
-            // Energy drift (conservation check)
-            Color drift_col = (dE_pct < 0.01) ? cg : (dE_pct < 0.1) ? cy : cr;
-            snprintf(buf, sizeof(buf), "E drift: %.6f %%", dE_pct);
-            DrawText(buf, x, y, 14, drift_col); y += dy;
+        //     // Energy drift (conservation check)
+        //     Color drift_col = (dE_pct < 0.01) ? cg : (dE_pct < 0.1) ? cy : cr;
+        //     snprintf(buf, sizeof(buf), "E drift: %.6f %%", dE_pct);
+        //     DrawText(buf, x, y, 14, drift_col); y += dy;
 
-            // Angular momentum drift
-            Color h_col = (dH_pct < 0.01) ? cg : (dH_pct < 0.1) ? cy : cr;
-            snprintf(buf, sizeof(buf), "h drift: %.6f %%", dH_pct);
-            DrawText(buf, x, y, 14, h_col); y += dy;
+        //     // Angular momentum drift
+        //     Color h_col = (dH_pct < 0.01) ? cg : (dH_pct < 0.1) ? cy : cr;
+        //     snprintf(buf, sizeof(buf), "h drift: %.6f %%", dH_pct);
+        //     DrawText(buf, x, y, 14, h_col); y += dy;
 
-            // Time scale
-            snprintf(buf, sizeof(buf), "Speed  : %.0fx  (+/- to change)", time_scale);
-            DrawText(buf, x, y, 14, cy); y += dy;
+        //     // Time scale
+        //     snprintf(buf, sizeof(buf), "Speed  : %.0fx  (+/- to change)", time_scale);
+        //     DrawText(buf, x, y, 14, cy); y += dy;
 
-            // Sim time
-            double hrs = sim_time / 3600.0;
-            snprintf(buf, sizeof(buf), "Time   : %.2f hrs", hrs);
-            DrawText(buf, x, y, 14, cw);
+        //     // Sim time
+        //     double hrs = sim_time / 3600.0;
+        //     snprintf(buf, sizeof(buf), "Time   : %.2f hrs", hrs);
+        //     DrawText(buf, x, y, 14, cw);
 
-            if (crashed) {
-                DrawText("CRASHED INTO EARTH", x, y + dy, 16, cr);
-            }
-            if (paused) {
-                DrawText("[ PAUSED ]", x, y + dy * 2, 16, cy);
-            }
-        }
+        //     if (crashed) {
+        //         DrawText("CRASHED INTO EARTH", x, y + dy, 16, cr);
+        //     }
+        //     if (paused) {
+        //         DrawText("[ PAUSED ]", x, y + dy * 2, 16, cy);
+        //     }
+        // }
 
-        // ── Key legend ────────────────────────────────────────────────────────
-        {
-            int bx = SCREEN_W - 240, by = SCREEN_H - 130;
-            DrawRectangle(bx - 5, by - 5, 235, 120, (Color){0,0,0,140});
-            DrawRectangleLines(bx - 5, by - 5, 235, 120, (Color){80,80,80,200});
-            Color cl = (Color){160, 160, 160, 255};
-            DrawText("1-4  : Load preset",     bx, by,      13, cl);
-            DrawText("SPACE: Pause / Resume",  bx, by + 18, 13, cl);
-            DrawText("R    : Reset",           bx, by + 36, 13, cl);
-            DrawText("+/-  : Time scale",      bx, by + 54, 13, cl);
-            DrawText("ESC  : Quit",            bx, by + 72, 13, cl);
-        }
+        // // ── Key legend ────────────────────────────────────────────────────────
+        // {
+        //     int bx = SCREEN_W - 240, by = SCREEN_H - 130;
+        //     DrawRectangle(bx - 5, by - 5, 235, 120, (Color){0,0,0,140});
+        //     DrawRectangleLines(bx - 5, by - 5, 235, 120, (Color){80,80,80,200});
+        //     Color cl = (Color){160, 160, 160, 255};
+        //     DrawText("1-4  : Load preset",     bx, by,      13, cl);
+        //     DrawText("SPACE: Pause / Resume",  bx, by + 18, 13, cl);
+        //     DrawText("R    : Reset",           bx, by + 36, 13, cl);
+        //     DrawText("+/-  : Time scale",      bx, by + 54, 13, cl);
+        //     DrawText("ESC  : Quit",            bx, by + 72, 13, cl);
+        // }
 
         EndDrawing();
     }
