@@ -21,7 +21,7 @@ typedef int (*DerivFnDouble)(double t, const double state_obj1[STATE_DIM],
 // Advances `state` by timestep `dt` using derivative function `f`.
 // Writes result into `out`.
 // Returns 0 on success, -1 if any derivative evaluation signals a collision.
-int rk4_step_double_body(DerivFn f, double t, const double state_obj1[STATE_DIM],const double state_obj2[STATE_DIM],
+int rk4_step_double_body(DerivFnDouble f, double t, const double state_obj1[STATE_DIM],const double state_obj2[STATE_DIM],
              double dt, double out_obj1[STATE_DIM],double out_obj2[STATE_DIM]);
 
 #endif // SOLVER_H

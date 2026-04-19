@@ -12,21 +12,9 @@
 #define SCREEN_H    900
 #define TARGET_FPS  60
 
-
-// ── Two-bodies ───────────────────────────────────────────────────────────────────
-#define M_OBJ1  31
-#define R_OBJ1 
-#define GM1 (G * M_OBJ1)
-
-#define M_OBJ2 69
-#define R_OBJ2
-#define GM2 (G * M_OBJ2)
-
-
 // 1 pixel = SCALE meters
 // Earth radius in pixels = R_EARTH / SCALE ≈ 254 px  (fits comfortably)
 #define SCALE       25000.0
-// #define SCALE       250000.0
 
 // ── Simulation defaults ───────────────────────────────────────────────────────
 #define DT              1.0         // physics timestep (seconds)
@@ -34,6 +22,8 @@
 #define TIME_SCALE_MIN  10.0
 #define TIME_SCALE_MAX  50000.0
 #define TIME_SCALE_STEP 1.5         // multiply/divide on +/- key
+
+#define TIME_SCALE_INIT_TB   50000.0     // two-body default
 
 // ── Trail ─────────────────────────────────────────────────────────────────────
 #define TRAIL_LEN   2000            // circular buffer capacity
@@ -53,5 +43,19 @@
 #define PRESET_LEO_R    (R_EARTH + PRESET_LEO_ALT)
 #define PRESET_GEO_R    (R_EARTH + PRESET_GEO_ALT)
 #define PRESET_ELLIP_R  (R_EARTH + PRESET_ELLIP_ALT)
+
+// ── Two-body rendering scale ──────────────────────────────────────────────────
+// 1 px = TWO_BODY_SCALE metres
+// Objects at d=1e8 m from origin → 100 px from centre on screen
+#define TWO_BODY_SCALE  1e6
+
+// ── Two-body object definitions ───────────────────────────────────────────────
+#define M_OBJ1  1e26
+#define R_OBJ1  1e10
+#define GM1     (G * M_OBJ1)
+
+#define M_OBJ2  1e26
+#define R_OBJ2  1e10
+#define GM2     (G * M_OBJ2)
 
 #endif // CONFIG_H

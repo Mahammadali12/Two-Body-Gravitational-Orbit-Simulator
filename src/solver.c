@@ -60,7 +60,7 @@ int rk4_step_double_body(DerivFnDouble f, double t, const double state_obj1[STAT
     for (i = 0; i < STATE_DIM; i++)
         out_obj1[i] = state_obj1[i] + (dt/6.0)*(k1_1[i] + 2*k2_1[i] + 2*k3_1[i] + k4_1[i]);
     for (i = 0; i < STATE_DIM; i++)
-    out_obj2[i] = state_obj2[i] + (dt/6.0)*(k1_2[i] + 2*k2_2[i] + 2*k3_2[i] + k4_2[i]);
+        out_obj2[i] = state_obj2[i] + (dt/6.0)*(k1_2[i] + 2*k2_2[i] + 2*k3_2[i] + k4_2[i]);
 
     return 0;
 }
