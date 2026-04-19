@@ -11,6 +11,11 @@
 int gravity_derivatives(double t, const double state[STATE_DIM],
                         double out[STATE_DIM]);
 
+
+// gravity derivative for two moving objects, two calculations are made
+int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM], 
+                        const double state_obj2[STATE_DIM], double out1[STATE_DIM], double out2[STATE_DIM]);
+
 // Specific orbital energy (J/kg):  E = 0.5*v² - GM/r
 double specific_energy(const double state[STATE_DIM]);
 

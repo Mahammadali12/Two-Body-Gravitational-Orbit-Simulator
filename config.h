@@ -12,6 +12,17 @@
 #define SCREEN_H    900
 #define TARGET_FPS  60
 
+
+// ── Two-bodies ───────────────────────────────────────────────────────────────────
+#define M_OBJ1  31
+#define R_OBJ1 
+#define GM1 (G * M_OBJ1)
+
+#define M_OBJ2 69
+#define R_OBJ2
+#define GM2 (G * M_OBJ2)
+
+
 // 1 pixel = SCALE meters
 // Earth radius in pixels = R_EARTH / SCALE ≈ 254 px  (fits comfortably)
 #define SCALE       25000.0

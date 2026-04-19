@@ -28,6 +28,54 @@ int gravity_derivatives(double t, const double state[STATE_DIM],
     return 0;
 }
 
+
+int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM], 
+                        const double state_obj2[STATE_DIM], double out1[STATE_DIM], double out2[STATE_DIM])
+{
+    (void)t; // autonomous system — time unused
+
+    double x1  = state_obj1[0];
+    double y1  = state_obj1[1];
+    double vx1 = state_obj1[2];
+    double vy1 = state_obj1[3];
+
+    double x2  = state_obj2[0];
+    double y2  = state_obj2[1];
+    double vx2 = state_obj2[2];
+    double vy2 = state_obj2[3];
+
+    // double r  = sqrt(x*x + y*y);
+    double distance = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+
+    // if (distance < R_obj1 + R_obj2) return -1;     // collision with each other
+
+    double distance3 = distance*distance*distance;
+    
+    // double a  = -GM / r3;           // scalar: -GM/r³
+    double a1  = - GM2 / distance3; // the acceleration of obj1
+    double a2  = - GM1 / distance3; // the acceleration of obj2
+
+
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+
+    
+    out1[0] = vx1;
+    out1[1] = vy1;
+    out1[2] = a1 * dx;
+    out1[3] = a1 * dy;
+
+
+    out2[0] = vx2;
+    out2[1] = vy2;
+    out2[2] = a2 * (-dx);
+    out2[3] = a2 * (-dy);   
+    
+    return 0;
+    
+}
+
+
 double orbital_radius(const double state[STATE_DIM])
 {
     double x = state[0], y = state[1];
