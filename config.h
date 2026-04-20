@@ -55,6 +55,7 @@ typedef struct {
     double x, y;     // position (m)
     double vx, vy;   // velocity (m/s)
     double mass;     // kg
+    double radius;
 } Planet;
 
 // ── Two-body object definitions ───────────────────────────────────────────────
@@ -71,8 +72,11 @@ typedef struct {
 #define N_BODY_MAX     8    // max array size, keep fixed for stack allocation
 
 static const double MASS_POOL[] = {
-    1e26, 1.5e26, 2e26, 8e25, 1.2e26, 1.8e26, 9e25, 2.2e26
+    1e26, 1.5e26, 2e26, 8e26, 1.2e26, 1.8e26, 9e26, 2.2e26
 };
+// static const double MASS_POOL[] = {
+//     1e26, 1.5e26, 2e26, 2e26, 1.2e26, 1.8e26, 1e26, 2.2e26
+// };
 #define MASS_POOL_SIZE  8
 
 

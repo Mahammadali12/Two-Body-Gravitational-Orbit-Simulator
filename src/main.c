@@ -102,39 +102,51 @@ static void load_two_body(double s1[STATE_DIM], double s2[STATE_DIM])
 
 static void load_n_body(Planet states[N_BODY_MAX], int n)
 {
-    SetRandomSeed(time(0));
-    // srand(time(0))
+    double total_mass = 0.0;
+    double sum_x = 0, sum_y = 0, sum_vx = 0, sum_vy = 0;
 
-    double total_momentum_x = 0.0;
-    double total_momentum_y = 0.0;
-    double total_CM_x       = 0.0;
-    double total_CM_y       = 0.0;
+    // Use a wider spread for better visibility (TWO_BODY_SCALE is 1e6, so 4e8 = 400px)
+    double spread = 4e8; 
+    double v_limit = 3e4; 
 
-    double spread  = (1e8);
-    // double vspread = 1e3;
-    double vspread = 5e2;
+    for (int i = 0; i < n; i++) {
+        bool overlap;
+        do {
+            overlap = false;
+            states[i].mass = MASS_POOL[GetRandomValue(0, MASS_POOL_SIZE - 1)];
+            states[i].radius = 5e6 + (states[i].mass / 2.2e26) * 1e7;
+            states[i].x = (GetRandomValue(-1000, 1000) / 1000.0) * spread;
+            states[i].y = (GetRandomValue(-1000, 1000) / 1000.0) * spread;
 
-    for (int i = 0; i < n - 1; i++) {
-        states[i].mass = MASS_POOL[GetRandomValue(0, MASS_POOL_SIZE - 1)];
-        states[i].x    = (GetRandomValue(-1000, 1000) / 1000.0) * spread;
-        states[i].y    = (GetRandomValue(-1000, 1000) / 1000.0) * spread;
-        states[i].vx   = (GetRandomValue(-1000, 1000) / 1000.0) * vspread;
-        states[i].vy   = (GetRandomValue(-1000, 1000) / 1000.0) * vspread;
+            for (int j = 0; j < i; j++) {
+                double dx = states[i].x - states[j].x, dy = states[i].y - states[j].y;
+                double dist = sqrt(dx*dx + dy*dy);
+                // Buffer of 2.0x radius to prevent immediate "slingshot" encounters
+                if (dist < (states[i].radius + states[j].radius) * 2.0) {
+                    overlap = true;
+                    break;
+                }
+            }
+        } while (overlap);
 
-        total_CM_x       += states[i].mass * states[i].x;
-        total_CM_y       += states[i].mass * states[i].y;
-        total_momentum_x += states[i].mass * states[i].vx;
-        total_momentum_y += states[i].mass * states[i].vy;
+        states[i].vx = (GetRandomValue(-1000, 1000) / 1000.0) * v_limit;
+        states[i].vy = (GetRandomValue(-1000, 1000) / 1000.0) * v_limit;
+
+        total_mass += states[i].mass;
+        sum_x += states[i].x * states[i].mass;
+        sum_y += states[i].y * states[i].mass;
+        sum_vx += states[i].vx * states[i].mass;
+        sum_vy += states[i].vy * states[i].mass;
     }
 
-    // Last planet satisfies CM-at-origin and zero total momentum
-    states[n-1].mass = MASS_POOL[GetRandomValue(0, MASS_POOL_SIZE - 1)];
-    states[n-1].x    = -total_CM_x       / states[n-1].mass;
-    states[n-1].y    = -total_CM_y       / states[n-1].mass;
-    states[n-1].vx   = -total_momentum_x / states[n-1].mass;
-    states[n-1].vy   = -total_momentum_y / states[n-1].mass;
+    // Centering the system globally
+    for (int i = 0; i < n; i++) {
+        states[i].x -= (sum_x / total_mass);
+        states[i].y -= (sum_y / total_mass);
+        states[i].vx -= (sum_vx / total_mass);
+        states[i].vy -= (sum_vy / total_mass);
+    }
 }
-
 // ── Preset metadata ───────────────────────────────────────────────────────────
 
 #define PRESET_COUNT 6
@@ -264,8 +276,7 @@ int main(void)
                         crashed = 1;
                         break;
                     }
-                    // memcpy(nb_states, nb_next, sizeof(Planet) * N_BODY_COUNT);
-                    *nb_next= *nb_states;
+                    memcpy(nb_states, nb_next, sizeof(Planet) * N_BODY_COUNT);
 
                 } else if (two_body) {
                     if (rk4_step_double_body(gravity_derivatives_double_body,
@@ -289,6 +300,11 @@ int main(void)
                 sim_time += step;
                 elapsed  += step;
             }
+
+            for (size_t i = 0; i < 5; i++)
+                printf("[%d] x = %f y = %f\n",i,nb_states[i].x,nb_states[i].y);
+            
+            // printf("x = %f y = %f\n",nb_states[0].x,nb_states[0].y);
 
             // // Trails (single and two-body only)
             // if (two_body) {

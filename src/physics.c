@@ -82,34 +82,38 @@ int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM]
 // Returns -1 if any collision detected
 int gravity_derivatives_n_body(double t, const Planet states[N_BODY_MAX], int n, Planet out[N_BODY_MAX])
 {
+    (void)t;
+    // Softening factor: prevents force from exploding at small distances.
+    // Set this roughly to the average radius of your planets.
+    const double softening = 1e7; 
 
-        (void)t; // autonomous system — time unused
-    for (int i = 0; i < n; i++)
-    {
+    for (int i = 0; i < n; i++) {
         out[i].x = states[i].vx;
         out[i].y = states[i].vy;
         out[i].vx = 0;
         out[i].vy = 0;
         
-        for (int j = 0; j < n; j++)
-        {
-            if(j==i) continue;
+        for (int j = 0; j < n; j++) {
+            if(j == i) continue;
             double dx = states[j].x - states[i].x;
             double dy = states[j].y - states[i].y;
-            double dist  = sqrt(dx*dx + dy*dy);
 
-            // if(dist < states[i].radius + states[j].radius) return -1;
-
-            double dist3 = dist*dist*dist;
-
+            double dist_sq = dx*dx + dy*dy;
             
-            out[i].vx += G * states[j].mass * dx / dist3;
-            out[i].vy += G * states[j].mass * dy / dist3;
+            // Hard collision check
+            if(dist_sq < (states[i].radius + states[j].radius) * (states[i].radius + states[j].radius)) 
+                return -1;
+
+            // Softened gravity: a = G*M*r / (r^2 + epsilon^2)^(1.5)
+            double dist_soft_sq = dist_sq + (softening * softening);
+            double inv_dist3 = 1.0 / (dist_soft_sq * sqrt(dist_soft_sq));
+
+            out[i].vx += G * states[j].mass * dx * inv_dist3;
+            out[i].vy += G * states[j].mass * dy * inv_dist3;
         }   
     }
     return 0;
 }
-
 
 double orbital_radius(const double state[STATE_DIM])
 {
