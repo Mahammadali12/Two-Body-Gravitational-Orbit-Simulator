@@ -24,4 +24,9 @@ typedef int (*DerivFnDouble)(double t, const double state_obj1[STATE_DIM],
 int rk4_step_double_body(DerivFnDouble f, double t, const double state_obj1[STATE_DIM],const double state_obj2[STATE_DIM],
              double dt, double out_obj1[STATE_DIM],double out_obj2[STATE_DIM]);
 
+
+typedef int (*DerivFnNBody)(double t, const Planet states[N_BODY_MAX], int n, Planet out[N_BODY_MAX]);
+
+int rk4_step_n_body(DerivFnNBody f, double t,int n, const Planet states[N_BODY_MAX],double dt, const Planet out[N_BODY_MAX]);
+
 #endif // SOLVER_H

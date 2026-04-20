@@ -79,6 +79,37 @@ int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM]
 }
 
 
+// Returns -1 if any collision detected
+int gravity_derivatives_n_body(double t, const Planet states[N_BODY_MAX], int n, Planet out[N_BODY_MAX])
+{
+    for (int i = 0; i < n; i++)
+    {
+        out[i].vx = 0;
+        out[i].vy = 0;
+        for (int j = 0; j < n; j++)
+        {
+            if(j==i) continue;
+            double dx = states[j].x - states[i].x;
+            double dy = states[j].y - states[i].y;
+            double dist  = sqrt(dx*dx + dy*dy);
+
+            // if(dist < states[i].radius + states[j].radius) return -1;
+
+            double dist3 = dist*dist*dist;
+
+            out[i].x += states[j].vx;
+            out[i].y += states[j].vy;
+            out[i].vx += G * states[j].mass * dx / dist3;
+            out[i].vy += G * states[j].mass * dy / dist3;
+        }
+        
+        
+    }
+    
+
+}
+
+
 double orbital_radius(const double state[STATE_DIM])
 {
     double x = state[0], y = state[1];

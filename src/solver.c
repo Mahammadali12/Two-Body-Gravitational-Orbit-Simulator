@@ -64,3 +64,49 @@ int rk4_step_double_body(DerivFnDouble f, double t, const double state_obj1[STAT
 
     return 0;
 }
+
+int rk4_step_n_body(DerivFnNBody f, double t,int n, const Planet states[N_BODY_MAX],double dt, Planet out[N_BODY_MAX])
+{
+    Planet k1[n], k2[n], k3[n], k4[n];
+    Planet tmp[n];
+    int i,j;
+
+    if(f(t,states,n,k1) < 0 ) return -1;
+    for (i = 0; i < n; i++)
+    {
+        tmp[i].x  = states[i].x + 0.5 * dt * k1[i].x;
+        tmp[i].y  = states[i].y + 0.5 * dt * k1[i].y;
+        tmp[i].vx = states[i].vx + 0.5 * dt * k1[i].vx;
+        tmp[i].vy = states[i].vy + 0.5 * dt * k1[i].vy;
+    }
+        
+    if(f(t + 0.5*dt,tmp,n, k2) < 0) return -1;
+    for (i = 0; i < n; i++)
+    {
+        tmp[i].x  = states[i].x + 0.5 * dt * k2[i].x;
+        tmp[i].y  = states[i].y + 0.5 * dt * k2[i].y;
+        tmp[i].vx = states[i].vx + 0.5 * dt * k2[i].vx;
+        tmp[i].vy = states[i].vy + 0.5 * dt * k2[i].vy;
+    }
+
+    if(f(t + 0.5*dt,tmp,n, k3) < 0) return -1;
+    for (i = 0; i < n; i++)
+    {
+        tmp[i].x  = states[i].x + 0.5 * dt * k3[i].x;
+        tmp[i].y  = states[i].y + 0.5 * dt * k3[i].y;
+        tmp[i].vx = states[i].vx + 0.5 * dt * k3[i].vx;
+        tmp[i].vy = states[i].vy + 0.5 * dt * k3[i].vy;
+    }
+
+
+    if (f(t + dt, tmp,n, k4) < 0) return -1;
+
+    for (i = 0; i < n; i++)
+    {
+        out[i].x  = states[i].x + (dt / 6.0) * (k1[i].x + 2.0*k2[i].x + 2.0*k3[i].x + k4[i].x);
+        out[i].y  = states[i].y + (dt / 6.0) * (k1[i].y + 2.0*k2[i].y + 2.0*k3[i].y + k4[i].y);
+        out[i].vx = states[i].vx + (dt / 6.0) * (k1[i].vx + 2.0*k2[i].vx + 2.0*k3[i].vx + k4[i].vx);
+        out[i].vy = states[i].vy + (dt / 6.0) * (k1[i].vy + 2.0*k2[i].vy + 2.0*k3[i].vy + k4[i].vy);
+    }
+
+}

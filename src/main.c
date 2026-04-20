@@ -86,6 +86,44 @@ static void load_two_body(double s1[STATE_DIM], double s2[STATE_DIM])
     s2[2] =  0.0; s2[3] = -0;
 }
 
+
+static void load_n_body(Planet states[N_BODY_MAX], int n)
+{
+    // Placeholder: random positions/velocities, zero total momentum
+    SetRandomSeed(123);
+
+    double total_momentum_x = 0.0;
+    double total_momentum_y = 0.0;
+    double total_CM_x = 0.0;
+    double total_CM_y = 0.0;
+    double total_mass = 0.0;
+
+    for (int i = 0; i < (n-1); i++) //last planet will be handled differently
+    {
+        states[i].mass = MASS_POOL[GetRandomValue(0,MASS_POOL_SIZE)];
+        states[i].x = GetRandomValue(-1e11, 1e11);
+        states[i].y = GetRandomValue(-1e11, 1e11);
+        states[i].vx = GetRandomValue(-1e3, 1e3);
+        states[i].vy = GetRandomValue(-1e3, 1e3);
+
+        total_CM_x += states[i].mass * states[i].x;
+        total_CM_y += states[i].mass * states[i].y;
+
+        total_momentum_x += states[i].mass * states[i].vx;
+        total_momentum_y += states[i].mass * states[i].vy;
+        total_mass += states[i].mass;
+    }
+
+    // Adjust last planet to ensure total momentum is zero
+    states[n-1].mass = MASS_POOL[GetRandomValue(0,MASS_POOL_SIZE)];
+    states[n-1].x = -total_CM_x / total_mass; // Place at centre of mass
+    states[n-1].y = -total_CM_y / total_mass;
+    states[n-1].vx = -total_momentum_x / states[n-1].mass;
+    states[n-1].vy = -total_momentum_y / states[n-1].mass;
+    
+    
+}
+
 // ── Preset metadata ───────────────────────────────────────────────────────────
 
 #define PRESET_COUNT 5

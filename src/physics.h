@@ -4,6 +4,8 @@
 // State vector layout: [x, y, vx, vy]  (SI units: metres, m/s)
 #define STATE_DIM 4
 
+#include "config.h"
+
 // Compute derivatives of the state vector under Newtonian gravity.
 // out[0] = vx,   out[1] = vy
 // out[2] = ax,   out[3] = ay
@@ -15,6 +17,11 @@ int gravity_derivatives(double t, const double state[STATE_DIM],
 // gravity derivative for two moving objects, two calculations are made
 int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM], 
                         const double state_obj2[STATE_DIM], double out1[STATE_DIM], double out2[STATE_DIM]);
+
+
+
+// Returns -1 if any collision detected
+int gravity_derivatives_n_body(double t, const Planet states[N_BODY_MAX], int n, Planet out[N_BODY_MAX]);
 
 // Specific orbital energy (J/kg):  E = 0.5*v² - GM/r
 double specific_energy(const double state[STATE_DIM]);

@@ -49,6 +49,12 @@
 // Objects at d=1e8 m from origin → 100 px from centre on screen
 #define TWO_BODY_SCALE  1e6
 
+typedef struct {
+    double x, y;     // position (m)
+    double vx, vy;   // velocity (m/s)
+    double mass;     // kg
+} Planet;
+
 // ── Two-body object definitions ───────────────────────────────────────────────
 #define M_OBJ1  1e26
 #define R_OBJ1  1e7
@@ -57,5 +63,15 @@
 #define M_OBJ2  1e26
 #define R_OBJ2  1e7
 #define GM2     (G * M_OBJ2)
+
+// ── N-body rendering  ──────────────────────────────────────────────────
+#define N_BODY_COUNT   5
+#define N_BODY_MAX     8    // max array size, keep fixed for stack allocation
+
+static const double MASS_POOL[] = {
+    1e26, 1.5e26, 2e26, 8e25, 1.2e26, 1.8e26, 9e25, 2.2e26
+};
+#define MASS_POOL_SIZE  8
+
 
 #endif // CONFIG_H
