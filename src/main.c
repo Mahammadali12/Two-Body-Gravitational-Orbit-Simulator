@@ -163,7 +163,7 @@ int main(void)
             crashed  = 0;
             if (two_body) {
                 load_two_body(state1, state2);
-                time_scale = TIME_SCALE_INIT_TB;
+                // time_scale = TIME_SCALE_INIT_TB;
                 trail_init(&trail1);
                 trail_init(&trail2);
             } else {
@@ -223,7 +223,6 @@ int main(void)
             }
         }
 
-        printf("obj1 x = %f y = %f || obj2 x = %f y = %f\n",state1[2],state1[3],state2[2],state2[3]);
 
         // ── Render ────────────────────────────────────────────────────────────
         BeginDrawing();
@@ -255,39 +254,41 @@ int main(void)
             DrawCircleV((Vector2){SCREEN_W*0.5f, SCREEN_H*0.5f},
                         3.0f, (Color){255, 255, 100, 180});
 
-            // // Trail obj1 (cyan)
-            // int tc = trail1.count;
-            // for (int i = 1; i < tc; i++) {
-            //     float x0, y0, x1, y1;
-            //     trail_get(&trail1, i-1, &x0, &y0);
-            //     trail_get(&trail1, i,   &x1, &y1);
-            //     unsigned char a = (unsigned char)(((float)i / tc) * 220.0f);
-            //     DrawLineV((Vector2){x0,y0}, (Vector2){x1,y1},
-            //               (Color){80, 200, 255, a});
-            // }
+            // Trail obj1 (cyan)
+            int tc = trail1.count;
+            for (int i = 1; i < tc; i++) {
+                float x0, y0, x1, y1;
+                trail_get(&trail1, i-1, &x0, &y0);
+                trail_get(&trail1, i,   &x1, &y1);
+                unsigned char a = (unsigned char)(((float)i / tc) * 220.0f);
+                DrawLineV((Vector2){x0,y0}, (Vector2){x1,y1},
+                          (Color){80, 200, 255, a});
+            }
 
-            // // Trail obj2 (orange)
-            // tc = trail2.count;
-            // for (int i = 1; i < tc; i++) {
-            //     float x0, y0, x1, y1;
-            //     trail_get(&trail2, i-1, &x0, &y0);
-            //     trail_get(&trail2, i,   &x1, &y1);
-            //     unsigned char a = (unsigned char)(((float)i / tc) * 220.0f);
-            //     DrawLineV((Vector2){x0,y0}, (Vector2){x1,y1},
-            //               (Color){255, 160, 40, a});
-            // }
+            // Trail obj2 (orange)
+            tc = trail2.count;
+            for (int i = 1; i < tc; i++) {
+                float x0, y0, x1, y1;
+                trail_get(&trail2, i-1, &x0, &y0);
+                trail_get(&trail2, i,   &x1, &y1);
+                unsigned char a = (unsigned char)(((float)i / tc) * 220.0f);
+                DrawLineV((Vector2){x0,y0}, (Vector2){x1,y1},
+                          (Color){255, 160, 40, a});
+            }
 
             // Object 1 (cyan)
             Vector2 p1 = world_to_screen_tb(state1[0], state1[1], cm_x, cm_y);
-            DrawCircleV(p1, 12.0f, (Color){80, 200, 255, 255});
-            DrawCircleLines((int)p1.x, (int)p1.y, 16.0f,
-                            (Color){180, 240, 255, 160});
+            // printf("x = %f || y = %f\n",p1.x,p1.y);
+            DrawCircleV(p1, R_OBJ1/TWO_BODY_SCALE, (Color){80, 200, 255, 255});
+            // DrawCircleLines((int)p1.x, (int)p1.y, 16.0f,
+            //                 (Color){180, 240, 255, 160});
 
             // Object 2 (orange)
             Vector2 p2 = world_to_screen_tb(state2[0], state2[1], cm_x, cm_y);
-            DrawCircleV(p2, 12.0f, (Color){255, 160, 40, 255});
-            DrawCircleLines((int)p2.x, (int)p2.y, 16.0f,
-                            (Color){255, 210, 140, 160});
+            DrawCircleV(p2, R_OBJ2/TWO_BODY_SCALE, (Color){255, 160, 40, 255});
+            // DrawCircleLines((int)p2.x, (int)p2.y, 16.0f,
+            //                 (Color){255, 210, 140, 160});
+            printf("obj1 x = %f y = %f || obj2 x = %f y = %f\n",p1.x,p1.y,p2.x,p2.y);
 
             if (crashed)
                 DrawText("COLLISION", SCREEN_W/2 - 50, SCREEN_H/2 - 20, 24, RED);

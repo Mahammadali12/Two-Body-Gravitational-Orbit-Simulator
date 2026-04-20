@@ -51,11 +51,11 @@
 
 // ── Two-body object definitions ───────────────────────────────────────────────
 #define M_OBJ1  1e26
-#define R_OBJ1  1e10
+#define R_OBJ1  1e7
 #define GM1     (G * M_OBJ1)
 
 #define M_OBJ2  1e26
-#define R_OBJ2  1e10
+#define R_OBJ2  1e7
 #define GM2     (G * M_OBJ2)
 
 #endif // CONFIG_H

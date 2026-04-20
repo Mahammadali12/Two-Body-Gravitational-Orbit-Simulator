@@ -44,20 +44,23 @@ int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM]
     double vx2 = state_obj2[2];
     double vy2 = state_obj2[3];
 
-    // double r  = sqrt(x*x + y*y);
-    double distance = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
 
-    // if (distance < R_obj1 + R_obj2) return -1;     // collision with each other
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+
+    // double r  = sqrt(x*x + y*y);
+    double distance = sqrt(dx*dx + dy*dy);
+
+    if (distance < R_OBJ1 + R_OBJ2) return -1;     // collision with each other
+    // if()
 
     double distance3 = distance*distance*distance;
     
     // double a  = -GM / r3;           // scalar: -GM/r³
-    double a1  = - GM2 / distance3; // the acceleration of obj1
-    double a2  = - GM1 / distance3; // the acceleration of obj2
+    double a1  =  GM2 / distance3; // the acceleration of obj1
+    double a2  =  GM1 / distance3; // the acceleration of obj2
 
 
-    double dx = x2 - x1;
-    double dy = y2 - y1;
 
     
     out1[0] = vx1;
