@@ -83,7 +83,7 @@ static void load_two_body(double s1[STATE_DIM], double s2[STATE_DIM])
 
     // Object 2: right, moving down (total momentum = 0)
     s2[0] =  d;   s2[1] = 0.0;
-    s2[2] =  0.0; s2[3] = -v;
+    s2[2] =  0.0; s2[3] = -0;
 }
 
 // ── Preset metadata ───────────────────────────────────────────────────────────
