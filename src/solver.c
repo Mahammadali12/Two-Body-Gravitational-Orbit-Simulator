@@ -71,6 +71,9 @@ int rk4_step_n_body(DerivFnNBody f, double t,int n, const Planet states[N_BODY_M
     Planet tmp[n];
     int i,j;
 
+    for (i = 0; i < n; i++)
+        tmp[i].mass = states[i].mass; //transfer masses to the next state
+
     if(f(t,states,n,k1) < 0 ) return -1;
     for (i = 0; i < n; i++)
     {
@@ -92,10 +95,10 @@ int rk4_step_n_body(DerivFnNBody f, double t,int n, const Planet states[N_BODY_M
     if(f(t + 0.5*dt,tmp,n, k3) < 0) return -1;
     for (i = 0; i < n; i++)
     {
-        tmp[i].x  = states[i].x + 0.5 * dt * k3[i].x;
-        tmp[i].y  = states[i].y + 0.5 * dt * k3[i].y;
-        tmp[i].vx = states[i].vx + 0.5 * dt * k3[i].vx;
-        tmp[i].vy = states[i].vy + 0.5 * dt * k3[i].vy;
+        tmp[i].x  = states[i].x + dt * k3[i].x;
+        tmp[i].y  = states[i].y + dt * k3[i].y;
+        tmp[i].vx = states[i].vx + dt * k3[i].vx;
+        tmp[i].vy = states[i].vy + dt * k3[i].vy;
     }
 
 
@@ -108,5 +111,7 @@ int rk4_step_n_body(DerivFnNBody f, double t,int n, const Planet states[N_BODY_M
         out[i].vx = states[i].vx + (dt / 6.0) * (k1[i].vx + 2.0*k2[i].vx + 2.0*k3[i].vx + k4[i].vx);
         out[i].vy = states[i].vy + (dt / 6.0) * (k1[i].vy + 2.0*k2[i].vy + 2.0*k3[i].vy + k4[i].vy);
     }
+
+    return 0;
 
 }

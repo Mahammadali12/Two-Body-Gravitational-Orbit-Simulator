@@ -100,11 +100,15 @@ static void load_n_body(Planet states[N_BODY_MAX], int n)
 
     for (int i = 0; i < (n-1); i++) //last planet will be handled differently
     {
-        states[i].mass = MASS_POOL[GetRandomValue(0,MASS_POOL_SIZE)];
-        states[i].x = GetRandomValue(-1e11, 1e11);
-        states[i].y = GetRandomValue(-1e11, 1e11);
-        states[i].vx = GetRandomValue(-1e3, 1e3);
-        states[i].vy = GetRandomValue(-1e3, 1e3);
+        states[i].mass = MASS_POOL[GetRandomValue(0,MASS_POOL_SIZE-1)];
+
+        double spread = 1e8;
+        states[i].x = (GetRandomValue(-1000, 1000) / 1000.0) * spread;
+        states[i].y = (GetRandomValue(-1000, 1000) / 1000.0) * spread;
+
+        double vspread = 1e3;
+        states[i].vx = (GetRandomValue(-1000, 1000) / 1000.0) * vspread;
+        states[i].vy = (GetRandomValue(-1000, 1000) / 1000.0) * vspread;
 
         total_CM_x += states[i].mass * states[i].x;
         total_CM_y += states[i].mass * states[i].y;
@@ -116,8 +120,9 @@ static void load_n_body(Planet states[N_BODY_MAX], int n)
 
     // Adjust last planet to ensure total momentum is zero
     states[n-1].mass = MASS_POOL[GetRandomValue(0,MASS_POOL_SIZE)];
-    states[n-1].x = -total_CM_x / total_mass; // Place at centre of mass
-    states[n-1].y = -total_CM_y / total_mass;
+
+    states[n-1].x = -total_CM_x / states[n-1].mass;
+    states[n-1].y = -total_CM_y / states[n-1].mass;
     states[n-1].vx = -total_momentum_x / states[n-1].mass;
     states[n-1].vy = -total_momentum_y / states[n-1].mass;
     

@@ -84,8 +84,11 @@ int gravity_derivatives_n_body(double t, const Planet states[N_BODY_MAX], int n,
 {
     for (int i = 0; i < n; i++)
     {
+        out[i].x = states[i].vx;
+        out[i].y = states[i].vy;
         out[i].vx = 0;
         out[i].vy = 0;
+        
         for (int j = 0; j < n; j++)
         {
             if(j==i) continue;
@@ -97,16 +100,12 @@ int gravity_derivatives_n_body(double t, const Planet states[N_BODY_MAX], int n,
 
             double dist3 = dist*dist*dist;
 
-            out[i].x += states[j].vx;
-            out[i].y += states[j].vy;
+            
             out[i].vx += G * states[j].mass * dx / dist3;
             out[i].vy += G * states[j].mass * dy / dist3;
-        }
-        
-        
+        }   
     }
-    
-
+    return 0;
 }
 
 
