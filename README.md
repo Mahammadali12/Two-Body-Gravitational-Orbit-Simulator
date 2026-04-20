@@ -1,21 +1,24 @@
 # Orbital Mechanics Simulator
 
-A real-time 2D orbital mechanics simulator written in C, featuring Newtonian gravity, RK4 numerical integration, and interactive orbit presets — including a gravitational two-body simulation.
+A real-time 2D orbital mechanics simulator written in C, featuring Newtonian gravity, RK4 numerical integration, and interactive orbit presets — including gravitational two-body and N-body simulations.
 
 ![Two-Body Simulation](two_body.gif)
+
+![N-Body Simulation](n-body.gif)
 
 ---
 
 ## Features
 
-- **5 simulation modes** selectable at runtime
+- **6 simulation modes** selectable at runtime
   - Circular LEO (400 km altitude)
   - Elliptical orbit (high eccentricity)
   - Geostationary orbit (35 786 km)
   - Escape trajectory (hyperbolic)
   - **Two-body gravitational simulation** (equal masses, mutual orbit)
+  - **N-body gravitational simulation** (5 bodies, randomised masses and positions)
 - **Adjustable time scale** from 10× to 50 000× real time
-- **Orbital trail** rendered via a circular buffer (2 000 points)
+- **Orbital trails** rendered via circular buffers (2 000 points per body), color-matched per planet in N-body mode
 - **Live HUD** showing preset name, simulation speed, and elapsed time
 - Collision detection (Earth surface / object-to-object)
 - All physics in SI units; display scales independently
@@ -49,6 +52,7 @@ make clean
 | `3` | Geostationary orbit |
 | `4` | Escape trajectory |
 | `5` | Two-body simulation |
+| `6` | N-body simulation |
 | `Space` | Pause / Resume |
 | `R` | Reset current preset |
 | `+` / `-` | Increase / Decrease time scale |
@@ -58,7 +62,7 @@ make clean
 
 ## Physics & Mathematics
 
-All physics runs in SI units. The display layer applies a separate pixel scale (25 km/px for single-body, 1 000 km/px for two-body).
+All physics runs in SI units. The display layer applies a separate pixel scale (25 km/px for single-body, 1 000 km/px for two-body and N-body).
 
 ### Newton's Law of Universal Gravitation
 
@@ -187,7 +191,7 @@ where `|r₁₂| = √((x₂−x₁)² + (y₂−y₁)²)` is the separation.
 **Initial circular orbit speed** for two equal masses `M` each at distance `d` from their common centre:
 
 ```
-F_gravity   = G·M² / (2d)²        (separation = 2d)
+F_gravity    = G·M² / (2d)²        (separation = 2d)
 F_centripetal = M·v² / d
 
 →  v = √(G·M / (4·d))
@@ -195,14 +199,49 @@ F_centripetal = M·v² / d
 
 The RK4 integrator is extended to handle the coupled 8-dimensional state simultaneously, ensuring that the slope estimates `k1`–`k4` for both objects are always computed at the same intermediate time and position — preserving the symmetry of the force law.
 
+### N-Body Gravitational Simulation
+
+The N-body mode simulates 5 bodies with randomised masses and initial conditions, all mutually attracting. The total acceleration on body `i` is the vector sum of forces from every other body `j`:
+
+```
+aᵢ = Σⱼ≠ᵢ  G·Mⱼ · (rⱼ − rᵢ) / |rⱼ − rᵢ|³
+```
+
+**Softened gravity** is used to prevent the acceleration from diverging as two bodies approach each other:
+
+```
+aᵢ = Σⱼ≠ᵢ  G·Mⱼ · (rⱼ − rᵢ) / (|rⱼ − rᵢ|² + ε²)^(3/2)
+```
+
+where `ε = 1×10⁷ m` is the softening length. Without it, a near-miss would produce a numerically unbounded force spike that corrupts the integration.
+
+**Collision detection** triggers when the centre-to-centre distance falls below the sum of the two physical radii:
+
+```
+|rⱼ − rᵢ| < rᵢ + rⱼ
+```
+
+When a collision is detected the simulation halts and displays a "COLLISION" message.
+
+**Initial conditions** are generated randomly each time mode 6 is selected or reset:
+
+- Masses drawn from a fixed pool ranging from `1×10²⁶` to `9×10²⁶ kg`
+- Positions placed randomly within a bounded region, with a 2× radius exclusion zone to prevent spawning inside each other
+- A small random tangential velocity is assigned to each body
+- The entire system is shifted so that the centre of mass starts at the origin and the net momentum is zeroed, placing the simulation in the zero-momentum frame
+
+**The RK4 integrator** is extended to the full N-body state: all N planets are integrated simultaneously, with the slope estimates `k1`–`k4` computed from the full mutual-force calculation at each sub-step. Mass and radius are non-dynamic quantities carried through the integration unchanged.
+
+**Trails** — each planet owns a 2 000-point circular trail buffer. One screen-space position is pushed per frame (60 Hz), giving ~33 seconds of visible history. Trails are rendered as fading line segments in each planet's assigned color, with alpha proportional to age.
+
 ---
 
 ## Architecture
 
 ```
-config.h          — all physical constants and simulation parameters
-src/physics.c     — gravity ODE RHS (single-body and two-body)
-src/solver.c      — RK4 integrator (generic DerivFn pointer)
+config.h          — all physical constants, simulation parameters, Trail and Planet structs
+src/physics.c     — gravity ODE RHS (single-body, two-body, N-body with softening)
+src/solver.c      — RK4 integrator (single-body, two-body, N-body variants)
 src/trail.c       — circular buffer for orbital trail rendering
 src/main.c        — raylib render loop, input handling, HUD
 ```
@@ -218,6 +257,9 @@ Single-body:  1 pixel = 25 000 m  (25 km/px)
 
 Two-body:     1 pixel = 1 000 000 m  (1 000 km/px)
               Camera origin = centre of mass
+
+N-body:       1 pixel = 1 000 000 m  (1 000 km/px)
+              Camera origin = centre of mass (recomputed each frame)
 ```
 
-All coordinate transforms are in `main.c` via `world_to_screen()` (single-body) and `world_to_screen_tb()` (two-body, CoM-relative).
+All coordinate transforms are in `main.c` via `world_to_screen()` (single-body) and `world_to_screen_tb()` (two-body and N-body, CoM-relative).
