@@ -30,6 +30,13 @@
 // ── Trail ─────────────────────────────────────────────────────────────────────
 #define TRAIL_LEN   2000            // circular buffer capacity
 
+typedef struct {
+    float x[TRAIL_LEN];
+    float y[TRAIL_LEN];
+    int   head;
+    int   count;
+} Trail;
+
 // ── Orbit presets ─────────────────────────────────────────────────────────────
 // Each preset sets initial position (x, y) and velocity (vx, vy) in SI units.
 // Satellite starts directly "above" Earth on the +y axis.
@@ -56,6 +63,7 @@ typedef struct {
     double vx, vy;   // velocity (m/s)
     double mass;     // kg
     double radius;
+    Trail  trail;
 } Planet;
 
 // ── Two-body object definitions ───────────────────────────────────────────────

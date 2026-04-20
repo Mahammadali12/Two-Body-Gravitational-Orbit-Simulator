@@ -3,13 +3,6 @@
 
 #include "../config.h"
 
-typedef struct {
-    float x[TRAIL_LEN];
-    float y[TRAIL_LEN];
-    int   head;     // index of next write slot
-    int   count;    // number of valid entries (capped at TRAIL_LEN)
-} Trail;
-
 void trail_init(Trail *t);
 void trail_push(Trail *t, float x, float y);
 

@@ -223,6 +223,7 @@ int main(void)
 
                 if (n_body) {
                     load_n_body(nb_states, N_BODY_COUNT);
+                    for (int j = 0; j < N_BODY_COUNT; j++) trail_init(&nb_states[j].trail);
                     time_scale = TIME_SCALE_INIT_NB;
                 } else if (two_body) {
                     load_two_body(state1, state2);
@@ -244,6 +245,7 @@ int main(void)
             crashed  = 0;
             if (n_body) {
                 load_n_body(nb_states, N_BODY_COUNT);
+                for (int j = 0; j < N_BODY_COUNT; j++) trail_init(&nb_states[j].trail);
                 // time_scale = TIME_SCALE_INIT_TB;
             } else if (two_body) {
                 load_two_body(state1, state2);
@@ -276,7 +278,14 @@ int main(void)
                         crashed = 1;
                         break;
                     }
-                    memcpy(nb_states, nb_next, sizeof(Planet) * N_BODY_COUNT);
+                    for (int j = 0; j < N_BODY_COUNT; j++) {
+                        nb_states[j].x      = nb_next[j].x;
+                        nb_states[j].y      = nb_next[j].y;
+                        nb_states[j].vx     = nb_next[j].vx;
+                        nb_states[j].vy     = nb_next[j].vy;
+                        nb_states[j].mass   = nb_next[j].mass;
+                        nb_states[j].radius = nb_next[j].radius;
+                    }
 
                 } else if (two_body) {
                     if (rk4_step_double_body(gravity_derivatives_double_body,
@@ -301,25 +310,14 @@ int main(void)
                 elapsed  += step;
             }
 
-            for (size_t i = 0; i < 5; i++)
-                printf("[%d] x = %f y = %f\n",i,nb_states[i].x,nb_states[i].y);
-            
-            // printf("x = %f y = %f\n",nb_states[0].x,nb_states[0].y);
-
-            // // Trails (single and two-body only)
-            // if (two_body) {
-            //     double cm_x, cm_y;
-            //     // manual CM for two fixed-mass objects
-            //     cm_x = (M_OBJ1*state1[0] + M_OBJ2*state2[0]) / (M_OBJ1+M_OBJ2);
-            //     cm_y = (M_OBJ1*state1[1] + M_OBJ2*state2[1]) / (M_OBJ1+M_OBJ2);
-            //     Vector2 sp1 = world_to_screen_tb(state1[0], state1[1], cm_x, cm_y);
-            //     Vector2 sp2 = world_to_screen_tb(state2[0], state2[1], cm_x, cm_y);
-            //     trail_push(&trail1, sp1.x, sp1.y);
-            //     trail_push(&trail2, sp2.x, sp2.y);
-            // } else if (!n_body) {
-            //     Vector2 sp = world_to_screen(state[0], state[1]);
-            //     trail_push(&trail, sp.x, sp.y);
-            // }
+            if (n_body) {
+                double cm_x, cm_y;
+                compute_cm(nb_states, N_BODY_COUNT, &cm_x, &cm_y);
+                for (int i = 0; i < N_BODY_COUNT; i++) {
+                    Vector2 p = world_to_screen_tb(nb_states[i].x, nb_states[i].y, cm_x, cm_y);
+                    trail_push(&nb_states[i].trail, p.x, p.y);
+                }
+            }
         }
 
         // ── Render ────────────────────────────────────────────────────────────
@@ -349,6 +347,18 @@ int main(void)
             // CM marker
             DrawCircleV((Vector2){SCREEN_W*0.5f, SCREEN_H*0.5f},
                         4.0f, (Color){255, 255, 100, 200});
+
+            for (int i = 0; i < N_BODY_COUNT; i++) {
+                const Trail *t = &nb_states[i].trail;
+                Color tc = PLANET_COLORS[i % 8];
+                for (int j = 1; j < t->count; j++) {
+                    float x0, y0, x1, y1;
+                    trail_get(t, j-1, &x0, &y0);
+                    trail_get(t,  j,  &x1, &y1);
+                    unsigned char a = (unsigned char)(((float)j / t->count) * 200.0f);
+                    DrawLineV((Vector2){x0,y0}, (Vector2){x1,y1}, (Color){tc.r,tc.g,tc.b,a});
+                }
+            }
 
             for (int i = 0; i < N_BODY_COUNT; i++) {
                 Vector2 p = world_to_screen_tb(nb_states[i].x, nb_states[i].y,
