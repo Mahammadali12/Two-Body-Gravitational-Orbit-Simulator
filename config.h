@@ -25,6 +25,8 @@
 
 #define TIME_SCALE_INIT_TB   50000.0     // two-body default
 
+#define TIME_SCALE_INIT_NB 5000.0 
+
 // ── Trail ─────────────────────────────────────────────────────────────────────
 #define TRAIL_LEN   2000            // circular buffer capacity
 

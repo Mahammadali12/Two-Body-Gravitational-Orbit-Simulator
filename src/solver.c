@@ -69,7 +69,7 @@ int rk4_step_n_body(DerivFnNBody f, double t,int n, const Planet states[N_BODY_M
 {
     Planet k1[n], k2[n], k3[n], k4[n];
     Planet tmp[n];
-    int i,j;
+    int i;
 
     for (i = 0; i < n; i++)
         tmp[i].mass = states[i].mass; //transfer masses to the next state

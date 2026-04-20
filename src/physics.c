@@ -82,6 +82,8 @@ int gravity_derivatives_double_body(double t, const double state_obj1[STATE_DIM]
 // Returns -1 if any collision detected
 int gravity_derivatives_n_body(double t, const Planet states[N_BODY_MAX], int n, Planet out[N_BODY_MAX])
 {
+
+        (void)t; // autonomous system — time unused
     for (int i = 0; i < n; i++)
     {
         out[i].x = states[i].vx;

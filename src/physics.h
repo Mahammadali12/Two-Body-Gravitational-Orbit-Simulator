@@ -4,7 +4,7 @@
 // State vector layout: [x, y, vx, vy]  (SI units: metres, m/s)
 #define STATE_DIM 4
 
-#include "config.h"
+#include "../config.h"
 
 // Compute derivatives of the state vector under Newtonian gravity.
 // out[0] = vx,   out[1] = vy
