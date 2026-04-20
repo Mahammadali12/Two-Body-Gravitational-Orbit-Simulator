@@ -110,7 +110,7 @@ static void load_n_body(Planet states[N_BODY_MAX], int n)
     double total_CM_x       = 0.0;
     double total_CM_y       = 0.0;
 
-    double spread  = (1e8)*2;
+    double spread  = (1e8);
     // double vspread = 1e3;
     double vspread = 5e2;
 
@@ -254,10 +254,7 @@ int main(void)
         if (!paused && !crashed) {
             double physics_seconds = dt_wall * time_scale;
             double elapsed = 0.0;
-            int max_steps = 200;          // ← ADD THIS
-            int steps = 0;
             while (elapsed < physics_seconds) {
-                if (++steps > max_steps) break;   // ← ADD THIS — drop excess steps
                 double step = fmin(DT, physics_seconds - elapsed);
 
                 if (n_body) {
@@ -267,8 +264,8 @@ int main(void)
                         crashed = 1;
                         break;
                     }
-                    memcpy(nb_states, nb_next, sizeof(Planet) * N_BODY_COUNT);
-                    // *nb_states = *nb_next;
+                    // memcpy(nb_states, nb_next, sizeof(Planet) * N_BODY_COUNT);
+                    *nb_next= *nb_states;
 
                 } else if (two_body) {
                     if (rk4_step_double_body(gravity_derivatives_double_body,
